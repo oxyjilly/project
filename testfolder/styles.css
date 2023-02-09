@@ -1,0 +1,38 @@
+
+head, body {
+    margin: 3%;
+}
+
+#largeHeading {
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 40px;
+    size: large;
+    color: linear-gradient(to bottom right, red, purple);
+
+}
+
+#loginUser, #loginPass{
+    text-align: center;
+    display: block;
+    size: large;
+    align-self: center;
+    width: 75%;
+    height: 60px;
+    align-self: center;
+    margin: 0 auto;
+}
+
+.calendarContainer {
+    height: calc(100vh - 190px);
+}
+
+#toNewEntry {
+    align-self: left;
+}
+
+
+#newEntryText {
+    height: calc(100vh - 200px);
+    width: 150ch;
+}
