@@ -13,12 +13,26 @@ head, body {
 }
 
 #loginUser, #loginPass{
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    color: #555;
     text-align: center;
     display: block;
     size: large;
     align-self: center;
     width: 75%;
     height: 60px;
+    align-self: center;
+    margin: 0 auto;
+}
+
+.button {
+    text-align: center;
+    display: block;
+    size: large;
+    align-self: center;
     align-self: center;
     margin: 0 auto;
 }
