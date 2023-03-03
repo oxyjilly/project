@@ -1,0 +1,1 @@
+CREATE TABLE if not exists users (userId INTEGER PRIMARY KEY, name TEXT, username TEXT, hash TEXT, tags INTEGER)
