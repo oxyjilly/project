@@ -7,3 +7,10 @@ document.addEventListener(`DOMContentLoaded`, function(){
         submitButton.value = `thank you`;
     });
 });
+
+// navigation tab for all html pages
+document.addEventListener('DOMContentLoaded', function(){
+    $(document).ready(function() {
+        $("#navTab").load("template.html .theNavbarCode");
+    });
+});

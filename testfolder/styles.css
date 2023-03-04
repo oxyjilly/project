@@ -50,3 +50,9 @@ head, body {
     height: calc(100vh - 200px);
     width: 150ch;
 }
+
+/*for lines in html what need to be centered: */
+.centered {
+    text-align: center;
+    margin-top: 50px;
+}
