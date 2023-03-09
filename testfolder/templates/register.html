@@ -1,0 +1,26 @@
+{% extends "template.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+
+        <!-- A form for user to register, that will be pushed to the register app route in code.py-->
+        <form action="/register" method="post">
+            <div class="nameUserDiv">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="name" placeholder="Name" type="text">
+            </div><br>
+            <div class="registerUserDiv">
+                <input autocomplete="off" class="form-control mx-auto w-auto" name="username" placeholder="Username" type="text">
+            </div><br>
+            <div class="registerPassDiv">
+                <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password">
+            </div><br>
+            <div class="registerPassConfDiv">
+                <input class="form-control mx-auto w-auto" name="confirmation" placeholder="Confirm password" type="password">
+            </div><br>
+            <button class="button" type="submit">Register!</button>
+        </form>
+
+{% endblock %}

@@ -12,7 +12,8 @@ head, body {
 
 }
 
-#loginUser, #loginPass{
+/* for the textbox´s to have nice style */
+#loginUser, #loginPass, .textbox {
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
@@ -28,6 +29,7 @@ head, body {
     margin: 0 auto;
 }
 
+/* for buttons to be centered */
 .button {
     text-align: center;
     display: block;

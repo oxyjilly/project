@@ -5,9 +5,10 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <link href="styles.css" rel="stylesheet">
-        <script src="code.py"></script>
-        <script src="code.js"></script> 
+
+        <script src="app.py"></script>
+        <link href="/static/styles.css" rel="stylesheet">
+        <script src="/static/code.js"></script>
 
         <title> New Entry </title>
         
@@ -15,11 +16,11 @@
     <body>
         <h1>New journal entry!</h1>
         <br>
-        <form action="newEntryTextBox">
-        <textarea placeholder="Write your entry here:" id="newEntryText"></textarea>
-        </form>
-        <h3>Submit to this date:</h3>
-        <form action="newEntrySubmitButton">
-        <input type="button" value="Submit entry" id="newEntrySubmit">
+        </form action="/newEntry" method="POST">
+            <div>
+                <textarea placeholder="Write your entry here:" name="newEntryText"></textarea>
+            </div>
+            <h3>Submit to this date:</h3>
+            <input type="button" value="Submit entry" name="newEntrySubmit">
         </form>
     </body>
