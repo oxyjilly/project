@@ -9,9 +9,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 #configure application
 app = Flask(__name__)
 
-# Configure session to use filesystem (instead of signed cookies)
+# Configure session to use filesystem (instead of signed cookies), set a secret key for the session and security
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config['SECRET_KEY'] = 'myveryverysuper8secret2387key'
 #Session(app)
 
 today = datetime.today()
@@ -68,15 +69,16 @@ def register():
         rows = db.execute("SELECT * FROM users WHERE username = ?", [usernameIn])
         print(rows)
 
-        if len(rows) != 0:
+        if rows.fetchone() is not None:
+            # There are no rows for this query
             apologyy = "This username already exists, pick another please!"
             return render_template("apology.html", apology=apologyy)
 
-        newUser = db.execute("INSERT INTO users(name, username, hash, tags) VALUES(?,?,?,?)", (nameIn), (usernameIn), (generate_password_hash(passwordIn)), (0))
-        db.commit()
+        newUser = db.execute("INSERT INTO users(name, username, hash, tags) VALUES(?,?,?,?)", [nameIn, usernameIn, generate_password_hash(passwordIn), 0])
+        conn.commit()
 
         # establish the session user id
-        session["user_id"] = newUser.lastrowid["username"]
+        session["user_id"] = usernameIn
 
         # Redirect user to home page
         return redirect("/main")
@@ -85,7 +87,7 @@ def register():
 def login():
 
     # Forget any user_id
-    # session.clear()
+    session.clear()
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
@@ -101,15 +103,25 @@ def login():
             return render_template("apology.html", apology=apologyy)
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username")))
+        rows = db.execute("SELECT * FROM users WHERE username = ?", [request.form.get("username")])
+        last_row = db.fetchone()
 
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            apologyy = "Invalid username and/or password!"
+        ############# something wrong with comparing hash and password even when its right #########
+        if last_row is None:
+            apologyy = "Invalid username"
             return render_template("apology.html", apology=apologyy)
 
+        if not check_password_hash(last_row["hash"], request.form.get("password")):
+            apologyy = "Invalid password!"
+            return render_template("apology.html", apology=apologyy)
+
+
+        # access the "username" column of the last row
+        usernameValue = last_row["username"]
+
         # Remember which user has logged in
-        session["user_id"] = rows[0]["username"]
+        session["user_id"] = usernameValue
 
         # Redirect user to home page
         return redirect("/main")
@@ -152,7 +164,6 @@ def newEntry():
 
 
        
-
 #main route which shows the calendar with the current dates
 @app.route("/")
 def showCalendar():
