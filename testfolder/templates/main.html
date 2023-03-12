@@ -7,17 +7,72 @@
 {% block main %}
 
         <!--Creates a div for the header, the id is used in js to put html from selectorTab into all divs with id navTab-->
-        <div id="navTab"></div><br><br>
+        <div id="navTab"></div>
 
-        <h1>Welcome !</h1>
-        <br><br>
+        <h1>Welcome {{name}}!</h1>
         <div class="calendarContainer">
-        <table>
-            <tr>
-                <td>1</td>
-                <td>2</td>
-            </tr>
-        </table>
+            
+            
+            <form action="/switchMonth" method="post">
+                <input type="submit" name="{{month_name}}" value="{{ month_name }}"></input>
+                <input type="hidden" name="currentYear" value="{{ year }}"></input>
+                <button type="submit" name="nextMonth"> &gt; </button>
+                <h1 class="centered">{{ month_name }} {{ year }}</h1>
+                <button type="submit" name="previousMonth"> &lt; </button>
+            </form> 
+
+
+            <table id="calendar">
+                <thead>
+                <tr>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                    <th>Sun</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for week in calendar %}
+                    <tr>
+                    {% for day in week %}
+                        {% if day %}
+                            {% if isEntry(year, month_name, day) %}
+                                <td><a href="{{ url_for('event', year=year, month=month_name, day=day) }}">{{ day }}</a></td>
+                            {% else %}
+                                <td>{{ day }} </td>
+                            {% endif %}
+                        {% else %}
+                        <td></td>
+                        {% endif %}
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="tagClass">
+
+            <form action="/main" method="post">
+                <input type="text" name="newTag" placeholder="Add new tag"></input>
+                <button type="submit" name="submitNewTag">Submit</button>
+            </form>
+            {% if len(tagName) == 0 %}
+                <h4> You have no tags! </h4>
+
+            {% else %}
+            <form action="/tag" method="post">
+
+                {% for row in tagName %}
+                    <button type="submit" name="selectedTag" value="{{ row }}"> {{ row }}</button><br>
+                {% endfor %}
+            </form>
+            {% endif %}
+
         </div>
         <!-- 
         <button onclick="document.location='newEntry.html'">New entry</button>

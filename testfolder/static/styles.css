@@ -39,6 +39,25 @@ head, body {
     margin: 0 auto;
 }
 
+.niceButton {
+  background: #FFFFFF;
+  border: 0 solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  color: #1A202C;
+  font-family: Inter, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  height: 56px;
+  line-height: 24px;
+  overflow-wrap: break-word;
+  padding: 24px;
+  text-decoration: none;
+  width: auto;
+  border-radius: 8px;
+}
+
+
 .calendarContainer {
     height: calc(100vh - 190px);
 }
@@ -57,4 +76,21 @@ head, body {
 .centered {
     text-align: center;
     margin-top: 50px;
+}
+
+#calendar td, th {
+    border: 3px solid;
+    padding: 20px;
+    width: 150px;
+    height: 100px;
+    text-align: center;
+  }
+
+/* For the tagClass div to position tags on the right hand side */
+.tagClass {
+    position: absolute;
+    top: 40%;
+    right: 5%;
+    float: right;
+
 }

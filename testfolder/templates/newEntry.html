@@ -10,12 +10,12 @@
 
         <h1>New journal entry!</h1>
         <br>
-        </form action="/newEntry" method="POST">
+        <form action="/newEntry" method="post">
             <div>
                 <textarea placeholder="Write your entry here:" name="newEntryText"></textarea>
             </div>
-            <h3>Submit to this date:</h3>
-            <input type="button" value="Submit entry" name="newEntrySubmit">
+            <h3>Submit to this date: {{date}} </h3>
+            <button name="newEntrySubmit" type="submit">Submit</button><br><br><br>
         </form>
 
 {% endblock %}

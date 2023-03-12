@@ -19,22 +19,40 @@
         <nav class="theNavbarCode">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                <a class="navbar-brand" href="/main">Home</a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                    <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/newEntry">New Entry</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/register">Register</a>
-                    </li>
-                    </ul>
+                    <!-- this class positions the buttons on the left. The jinja loop makes sure the user is logged in-->
+                    {% if session["user_id"] %}
+                        <ul class="navbar-nav me-auto mt-2">
+
+                            <li class="nav-item"><a class="nav-link active" aria-current="page" href="/main">Home</a></li>
+                                
+                            <li class="nav-item"><a class="nav-link active" aria-current="page" href="/newEntry">New Entry</a></li>
+
+                        </ul>
+                        <ul class="navbar-nav ms-auto mt-2">
+
+                            <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>                            
+
+                            <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+
+                            <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                        </ul>
+
+                    {% else %}
+                        <ul class="navbar-nav ms-auto mt-2">
+
+                            <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+
+                            <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                        </ul>
+                    {% endif %}
+
+
                 </div>
                 </div>
             </nav>
