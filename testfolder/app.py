@@ -26,11 +26,9 @@ currentYear = today.year
 conn = sqlite3.connect("journal.db", check_same_thread=False)
 db = conn.cursor()
 
-db.execute("CREATE TABLE if not exists users (username TEXT PRIMARY KEY, name TEXT, hash TEXT, tags INTEGER)")
-db.execute("CREATE TABLE IF NOT EXISTS entry (entryId INTEGER PRIMARY KEY, username TEXT, date TEXT, text TEXT, FOREIGN KEY (username) REFERENCES users(username))")
+db.execute("CREATE TABLE if not exists users (username TEXT PRIMARY KEY, name TEXT, hash TEXT)")
+db.execute("CREATE TABLE IF NOT EXISTS entry (entryId INTEGER PRIMARY KEY, username TEXT, date TEXT, title TEXT, text TEXT, tagName TEXT, FOREIGN KEY (username) REFERENCES users(username),  FOREIGN KEY (tagName) REFERENCES tags(tagName))")
 db.execute("CREATE TABLE IF NOT EXISTS tags (tagId INTEGER PRIMARY KEY, tagName TEXT, username TEXT, FOREIGN KEY (username) REFERENCES users(username))")
-db.execute("CREATE TABLE IF NOT EXISTS entryTag (id INTEGER PRIMARY KEY, entryId INTEGER, tagId INTEGER, FOREIGN KEY (entryId) REFERENCES entry (entryId), FOREIGN KEY (tagId) REFERENCES tags(tagId))")
-
 
 # an app route to allow user to register (from the register.html page)
 @app.route("/register", methods=["GET", "POST"])
@@ -79,7 +77,7 @@ def register():
             apologyy = "This username already exists, pick another please!"
             return render_template("apology.html", apology=apologyy)
 
-        newUser = db.execute("INSERT INTO users(name, username, hash, tags) VALUES(?,?,?,?)", [nameIn, usernameIn, generate_password_hash(passwordIn), 0])
+        newUser = db.execute("INSERT INTO users(name, username, hash) VALUES(?,?,?)", [nameIn, usernameIn, generate_password_hash(passwordIn)])
         conn.commit()
 
         # establish the session user id
@@ -149,15 +147,50 @@ def apology():
 # and month. These are used to find the calendar for that month and year using the calendar python inport
 
 @app.route("/main", methods=["GET", "POST"])
-def main(year=currentYear, month=currentMonth):
+def main():
     if request.method == "POST":
-        # IF submit new tag is clicked:
-        newTag = request.form.get("newTag")
-        print(newTag)
-        username = session["user_id"]
+        # importing the global variables so can cchange them and then use the new values
+        global currentYear
+        global currentMonth
+
+        # IF submit new tag is clicked (PART of the main screen), add the new tag into db:
+        if "newTag" in request.form:
+            newTag = request.form.get("newTag")
+            username = session["user_id"]
         
-        db.execute("INSERT INTO tags (tagName, userntagNameame) VALUES (?,?)", [newTag, username])
-        conn.commit()
+            # adding new tag into ´tags´ table
+            db.execute("INSERT INTO tags (tagName, username) VALUES (?,?)", [newTag, username])
+            conn.commit()
+
+        if "nextMonth" or "prevMonth" in request.form:
+
+            # TO SWITCH MONTH, when next or prev is clicked, this execut4es
+            # get the current values for next montha and prev month using if 
+            if "nextMonth" in request.form:
+                monthNow = request.form.get("nextMonth")
+                year = request.form.get("currentYear")
+
+                if monthNow == 1:
+                    yearNow = year + 1
+                else:
+                    yearNow = year
+
+                currentMonth = monthNow
+                currentYear = yearNow
+
+
+            if "prevMonth" in request.form:
+                monthNow = request.form.get("prevMonth")
+                year = request.form.get("currentYear")
+
+                if monthNow == 12:
+                    yearNow = year - 1
+                else:
+                    yearNow = year
+                
+                currentMonth = monthNow
+                currentYear = yearNow
+
         return redirect("/main")
     
     else:
@@ -166,6 +199,11 @@ def main(year=currentYear, month=currentMonth):
         # month_name = now.strftime('%B')
         # month = today.month
         # year = now.year
+
+        month = int(currentMonth)
+        year = int(currentYear)
+
+        print("the SECOND MAIN curretn month is : ", currentMonth)
 
         username = session["user_id"]
         name = db.execute("SELECT name FROM users WHERE username = ?", [username]).fetchone()[0]
@@ -217,49 +255,82 @@ def main(year=currentYear, month=currentMonth):
         for row in rows:
             tagName.append(row[0])
 
-
-        return render_template('main.html', month_names=month_names, month_name=month_name, year=year, day_name=day_names, 
-                                calendar=calendar_data, isEntry=isEntry, prevMonth=prevMonth, prevYear=prevYear, nextMonth=nextMonth, nextYear=nextYear, name=name,
-                                tagName=tagName)
+        #find length of tagName to see if it is empty (so user has no tags)
+        tagLen = len(tagName)
 
 
+        return render_template('main.html', month_names=month_names, month_name=month_name, year=year, day_name=day_names, calendar=calendar_data, isEntry=isEntry, prevMonth=prevMonth, prevYear=prevYear, nextMonth=nextMonth, nextYear=nextYear, name=name, tagName=tagName, tagLen=tagLen)
+
+'''
+FIX PLS YOU CANT HAVE A CALENDAR WITH ONLY ONE MONTH STUPID
 @app.route("/switchMonth", methods=["POST"])
 def switch():
 
+    # get the current values for next montha and prev month using if 
     if "nextMonth" in request.form:
-        monthNow = request.form["currentMonth"]
-        yearNow = request.form.get("currentYear")
+        monthNow = request.form.get("nextMonth")
+        year = request.form.get("currentYear")
 
-        print(monthNow)
-        print(yearNow)
+        if monthNow == 1:
+            yearNow = year + 1
+        else:
+            yearNow = year
+
+    if "prevMonth" in request.form:
+        monthNow = request.form.get("prevMonth")
+        year = request.form.get("currentYear")
 
         if monthNow == 12:
-            newMonth = 1
-            newYear = yearNow =+ 1
+            yearNow = year - 1
         else:
-            newMonth = monthNow =+ 1
-            newYear = yearNow
+            yearNow = year
+        
 
-    if "previousMonth" in request.form:
-        if monthNow == 1:
-            newMonth = 12
-            newYear = yearNow =- 1
-        else:
-            newMonth = monthNow =- 1
-            newYear = yearNow
+    print("month NOW IS: ", monthNow)
+    print("year NOW IS : ", yearNow)
 
-    print("newmonth: ", newMonth)
-    print("newYear :", newYear)
+    currentMonth = monthNow
+    currentYear = yearNow
 
-    return redirect(url_for('main', year=int(newYear), month=int(newMonth)))
-
+    return redirect("/main")
+'''
 
 #main route which shows the user the info for the date that they clicked
 @app.route("/event/<int:year>/<string:month>/<int:day>")
 def event(year, month, day):
-    apology = "you did something????? "
-    print("year: ", year, "month and day: ", month, day)
-    return render_template("apology.html", apology=apology)
+
+    #convert month name into month day: 
+    month_dict = {
+    "January": "01",
+    "February":"02",
+    "March": "03",
+    "April": "04",
+    "May": "05",
+    "June": "06",
+    "July": "07",
+    "August": "08",
+    "September": "09",
+    "October": "10",
+    "November": "11",
+    "December": "12"
+    }
+
+    monthDay = month_dict[month]
+
+    conDate = str(year) + "-" + str(monthDay) + "-" + str(day)
+
+    username = session["user_id"]
+    print(conDate)
+    entries = db.execute("SELECT title, text FROM entry WHERE date = (?) AND username = (?)", [conDate, username]).fetchall()
+
+    print("the entries db is: ", entries)
+    dateEntries = []
+    for entry in entries:
+        dateEntries.append({"title": entry[0], "text": entry[1]})
+
+    print("dateEntries isss: ", dateEntries)
+
+    return render_template("event.html", date=conDate, entries=dateEntries)
 
 
 # a function used to check if a date has any entries, so this can be displayed in the calendar
@@ -287,15 +358,16 @@ def isEntry(year, month_name, day):
     else:
         theDay = day
 
-    theDate = str(year) + "-" + str(monthDay) + "-" + str(theDay) 
-    print("theDate is: ", theDate)
+    theDate = str(year) + "-" + str(monthDay) + "-" + str(theDay)
 
     username = session["user_id"]
 
     rows = db.execute("SELECT * FROM entry WHERE username = (?) AND date = (?)", [username, theDate])
     row = db.fetchone()
-    print("rows: ", rows)
-    print("row: ", row)
+    
+    #print("rows: ", rows)
+    #print("row: ", row)
+    
     if row is not None:
         return True 
     else:
@@ -306,19 +378,30 @@ def isEntry(year, month_name, day):
 #make the route for a user submitting a newEntry
 @app.route("/newEntry", methods=["GET", "POST"])
 def newEntry():
-    # if request.form.get("action") == "newEntrySubmitButton":
     # User reached route via GET (by clicking a link or via redirect)
     if request.method == "GET":
-        return render_template("newEntry.html", date=today)
+
+        userId = session["user_id"]
+        tagRows = db.execute("SELECT tagName from tags WHERE username = ?", [userId]).fetchall()
+
+         #loop through all tag names and add them to dict tagsAvail
+        tagsAvail = []
+        for row in tagRows:
+            tagsAvail.append(row[0])
+
+        return render_template("newEntry.html", date=today, tagsAvail=tagsAvail)
 
     else: 
         userId = session["user_id"]
         entry = request.form.get("newEntryText")
+        title = request.form.get("newTitleText")
         date = today
 
-        #return render_template("apology.html", apology=entry)
+        #get the tag selected by user
+        taggg = request.form.get("tagAvail")
+        print("tagggggg is: ", taggg)
 
-        db.execute("INSERT INTO entry (username, text, date) VALUES (?,?,?)", [userId, entry, date])
+        db.execute("INSERT INTO entry (username, title, text, date, tagName) VALUES (?,?,?,?,?)", [userId, title, entry, date, taggg])
         conn.commit()
 
         return redirect("/main")
@@ -329,21 +412,21 @@ def newEntry():
 @app.route("/tag", methods=["GET", "POST"])
 def tag():
     if request.method=="POST":
-        tag = request.form.get("selectedTag")
+        #find the tagName that user (using their username) selected, find all entries which have that tag tagged in query
+        tagName = request.form.get("selectedTag")
         username = session["user_id"]
         
-        tagRows = db.execute("SELECT * FROM entry WHERE entryId = (SELECT entryId FROM entryTag WHERE tagId = (SELECT tagId FROM tags WHERE tagName = (?) AND username = (?)))", [tag, username]).fetchall()
-        
+        tagRows = db.execute("SELECT date, title, text FROM entry WHERE tagName = (?) AND username = (?)", [tagName, username]).fetchall()
+        #tagText = db.execute("SELECT text FROM entry WHERE tagName= (?) AND username = (?)", [tagName, username]).fetchall()
+
+        print("the TAGROWS IS: ", tagRows)
         tags = []
         for row in tagRows:
-            data = {"entryId": row[0], 'username': row[1], 'date': row[2], 'text': row[3]}
+            data = {"date": row[0], "title": row[1], "text": row[2]}
             tags.append(data)
+        print("tags dict is: ", tags)
 
-        return render_template("tags.html", tags=tags, tag=tag)
-
-    
-
-
+        return render_template("tags.html", tags=tags, tagName=tagName)
 
 
 
@@ -361,4 +444,3 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
-

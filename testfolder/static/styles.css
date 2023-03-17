@@ -72,6 +72,27 @@ head, body {
     width: 150ch;
 }
 
+/* the title for newEntry to be nice */
+.subTitle {
+    font-size: 16px;
+    color: black;
+    text-align: center;
+    display: block;
+    width: 90%;
+    height: 50px;
+    align-self: center;
+    margin: 0 auto;
+}
+
+/* for the submit entry textbox to be big and nice */
+.subBox {
+    width: 90%;
+    height: 200px; 
+    border: 1px solid #999999; 
+    padding: 5px;
+}
+
+
 /*for lines in html what need to be centered: */
 .centered {
     text-align: center;
@@ -90,7 +111,14 @@ head, body {
 .tagClass {
     position: absolute;
     top: 40%;
-    right: 5%;
+    right: 0;
     float: right;
+    width: 30%;
 
+}
+
+/* for the div with the calendar, so it takes up 80% on the left */
+.calendarContainer {
+    width: 65%;
+    float: left;
 }

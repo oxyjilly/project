@@ -12,9 +12,16 @@
         <br>
         <form action="/newEntry" method="post">
             <div>
-                <textarea placeholder="Write your entry here:" name="newEntryText"></textarea>
+                <textarea placeholder="Write your entry title here" name="newTitleText" class="subTitle"></textarea><br>
+                <textarea placeholder="Write your entry here:" name="newEntryText" class="subBox"></textarea>
             </div>
             <h3>Submit to this date: {{date}} </h3>
+
+            {% for row in tagsAvail %}
+                <input type="radio" name="tagAvail" value="{{ row }}">
+                <label for="tagAvail"> {{ row }}</label><br>
+            {% endfor %}
+
             <button name="newEntrySubmit" type="submit">Submit</button><br><br><br>
         </form>
 

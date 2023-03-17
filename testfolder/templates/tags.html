@@ -1,0 +1,19 @@
+{% extends "template.html" %}
+
+{% block title %}
+    Tags
+{% endblock %}
+
+{% block main %}
+    <h6 class="centered"> {{ tagName }}: </h6>
+    <br>
+
+    <div class="centered">
+    {% for row in tags %}
+        <h4> Date of entry: {{ row["date"] }}</h4><br>
+        <h4> {{row["title"]}} </h4>
+        <h3> {{ row.text }} </h3><br><br>
+    {% endfor %}
+    <div>
+
+{% endblock %}

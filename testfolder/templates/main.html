@@ -13,12 +13,12 @@
         <div class="calendarContainer">
             
             
-            <form action="/switchMonth" method="post">
-                <input type="submit" name="{{month_name}}" value="{{ month_name }}"></input>
+            <form action="/main" method="post">
                 <input type="hidden" name="currentYear" value="{{ year }}"></input>
-                <button type="submit" name="nextMonth"> &gt; </button>
-                <h1 class="centered">{{ month_name }} {{ year }}</h1>
-                <button type="submit" name="previousMonth"> &lt; </button>
+                <button type="submit" name="prevMonth" value="{{ prevMonth }}" style="display: inline-block;"> &lt; </button>
+                <h1 class="centered" style="display: inline-block;">{{ month_name }} {{ year }}</h1>
+                <button type="submit" name="nextMonth" value="{{ nextMonth }}" style="display: inline-block;"> &gt; </button>
+
             </form> 
 
 
@@ -61,7 +61,7 @@
                 <input type="text" name="newTag" placeholder="Add new tag"></input>
                 <button type="submit" name="submitNewTag">Submit</button>
             </form>
-            {% if len(tagName) == 0 %}
+            {% if tagLen == 0 %}
                 <h4> You have no tags! </h4>
 
             {% else %}
