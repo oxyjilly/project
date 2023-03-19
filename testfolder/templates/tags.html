@@ -10,10 +10,16 @@
 
     <div class="centered">
     {% for row in tags %}
-        <h4> Date of entry: {{ row["date"] }}</h4><br>
-        <h4> {{row["title"]}} </h4>
-        <h3> {{ row.text }} </h3><br><br>
+        <div class="entryBox">
+            <h4> Date of entry: {{ row["date"] }}</h4><br>
+            <h4> Title: {{row["title"]}} </h4><br><br>
+
+            <form action="/view" method="post">
+                <button type="submit" name="viewEntry" value="{{row["text"]}}"> View&#47;Edit</button><br>
+            </form>
+
+        </div>
     {% endfor %}
-    <div>
+    </div><br>
 
 {% endblock %}

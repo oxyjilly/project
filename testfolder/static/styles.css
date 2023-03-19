@@ -40,7 +40,7 @@ head, body {
 }
 
 .niceButton {
-  background: #FFFFFF;
+  background: #b6b6b6;
   border: 0 solid #E2E8F0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
@@ -121,4 +121,13 @@ head, body {
 .calendarContainer {
     width: 65%;
     float: left;
+}
+
+/* for the divs to make a rectangle box */
+.entryBox {
+    border: 2px solid black;
+    width: 90%;
+    padding: 20px;
+    margin: 15px;
+    text-align: center;
 }

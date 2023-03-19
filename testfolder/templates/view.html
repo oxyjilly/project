@@ -1,0 +1,21 @@
+{% extends "template.html" %}
+
+{% block title %}
+    View
+{% endblock %}
+
+{% block main %}
+
+    <div class="entryBox">
+
+        <form action="/edit" method="post">
+            {% for view in views %}
+                <input type="hidden" name="editId" value="{{ view["id"] }}"></input>
+                <textarea type="text" name="editTitle" class="subTitle">{{ view["title"] }}</textarea><br>
+                <textarea type="text" name="editText" class="subBox">{{ view["text"] }}</textarea><br>
+                <button type="submit">Save</button><br>
+            {% endfor %} 
+        </form>
+    </div>
+
+{% endblock %}

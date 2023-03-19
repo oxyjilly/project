@@ -28,7 +28,7 @@ db = conn.cursor()
 
 db.execute("CREATE TABLE if not exists users (username TEXT PRIMARY KEY, name TEXT, hash TEXT)")
 db.execute("CREATE TABLE IF NOT EXISTS entry (entryId INTEGER PRIMARY KEY, username TEXT, date TEXT, title TEXT, text TEXT, tagName TEXT, FOREIGN KEY (username) REFERENCES users(username),  FOREIGN KEY (tagName) REFERENCES tags(tagName))")
-db.execute("CREATE TABLE IF NOT EXISTS tags (tagId INTEGER PRIMARY KEY, tagName TEXT, username TEXT, FOREIGN KEY (username) REFERENCES users(username))")
+db.execute("CREATE TABLE IF NOT EXISTS tags (tagName TEXT PRIMARY KEY, username TEXT, FOREIGN KEY (username) REFERENCES users(username))")
 
 # an app route to allow user to register (from the register.html page)
 @app.route("/register", methods=["GET", "POST"])
@@ -200,12 +200,14 @@ def main():
         # month = today.month
         # year = now.year
 
+        if not session["user_id"]: 
+            return redirect("/login")
+
         month = int(currentMonth)
         year = int(currentYear)
 
-        print("the SECOND MAIN curretn month is : ", currentMonth)
-
         username = session["user_id"]
+
         name = db.execute("SELECT name FROM users WHERE username = ?", [username]).fetchone()[0]
 
         if month == 12:
@@ -321,12 +323,12 @@ def event(year, month, day):
 
     username = session["user_id"]
     print(conDate)
-    entries = db.execute("SELECT title, text FROM entry WHERE date = (?) AND username = (?)", [conDate, username]).fetchall()
+    entries = db.execute("SELECT title, text, tagName FROM entry WHERE date = (?) AND username = (?)", [conDate, username]).fetchall()
 
     print("the entries db is: ", entries)
     dateEntries = []
     for entry in entries:
-        dateEntries.append({"title": entry[0], "text": entry[1]})
+        dateEntries.append({"title": entry[0], "text": entry[1], "tag": entry[2]})
 
     print("dateEntries isss: ", dateEntries)
 
@@ -399,7 +401,6 @@ def newEntry():
 
         #get the tag selected by user
         taggg = request.form.get("tagAvail")
-        print("tagggggg is: ", taggg)
 
         db.execute("INSERT INTO entry (username, title, text, date, tagName) VALUES (?,?,?,?,?)", [userId, title, entry, date, taggg])
         conn.commit()
@@ -428,6 +429,32 @@ def tag():
 
         return render_template("tags.html", tags=tags, tagName=tagName)
 
+@app.route("/view", methods=["POST"])
+def view():
+    text = request.form.get("viewEntry")
+    username = session["user_id"]
+
+    rows = db.execute("SELECT date, title, text, tagName, entryId FROM entry WHERE username = (?) AND text = (?)", [username, text])
+
+    views = []
+    for row in rows:
+        data = {"date": row[0], "title": row[1], "text": row[2], "tag": row[3], "id": row[4]}
+        views.append(data)
+    
+    return render_template("view.html", views=views)
+
+#route to save changes that user made
+@app.route("/edit", methods=["POST"])
+def edit():
+    username = session["user_id"]
+    entryid = request.form.get("editId")
+    title = request.form.get("editTitle")
+    text = request.form.get("editText")
+
+    db.execute("UPDATE ENTRY SET title = (?), text = (?) WHERE entryId = (?)", [title, text, entryid])
+    conn.commit
+
+    return redirect("/main")
 
 
 #main route which shows the calendar with the current dates

@@ -10,8 +10,15 @@
 
     <div class="centered">
     {% for entry in entries %}
-        <h3> {{ entry["title"] }} </h3><br>
-        <h3> {{ entry["text"] }} </h3><br>
+        <div class="entryBox">
+            <h3> {{ entry["title"] }} </h3><br>
+            <h3> {{ entry["tag"] }} </h3><br>
+
+            <form action="/view" method="post">
+                <button type="submit" name="viewEntry" value="{{entry["text"]}}"> View&#47;Edit</button><br>
+            </form>
+
+         </div>
     {% endfor %}
     </div>
 
