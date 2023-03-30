@@ -1,9 +1,10 @@
 #import os
+#from tempfile import mkdtemp
+
 from datetime import date, datetime
 import sqlite3
-#from tempfile import mkdtemp
 from flask import Flask, redirect, render_template, request, session, url_for
-#from flask_session import Session
+from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 #configure application
@@ -13,7 +14,7 @@ app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['SECRET_KEY'] = 'myveryverysuper8secret2387key'
-#Session(app)
+Session(app)
 
 # extracting current year and date
 today = date.today()
@@ -26,9 +27,28 @@ currentYear = today.year
 conn = sqlite3.connect("journal.db", check_same_thread=False)
 db = conn.cursor()
 
-db.execute("CREATE TABLE if not exists users (username TEXT PRIMARY KEY, name TEXT, hash TEXT)")
-db.execute("CREATE TABLE IF NOT EXISTS entry (entryId INTEGER PRIMARY KEY, username TEXT, date TEXT, title TEXT, text TEXT, tagName TEXT, FOREIGN KEY (username) REFERENCES users(username),  FOREIGN KEY (tagName) REFERENCES tags(tagName))")
-db.execute("CREATE TABLE IF NOT EXISTS tags (tagName TEXT PRIMARY KEY, username TEXT, FOREIGN KEY (username) REFERENCES users(username))")
+db.execute("CREATE TABLE if not exists users (  \
+    username TEXT PRIMARY KEY, \
+    name TEXT, \
+    hash TEXT)" 
+) 
+
+db.execute("CREATE TABLE IF NOT EXISTS entry (  \
+    entryId INTEGER PRIMARY KEY,  \
+    username TEXT,  \
+    date TEXT,  \
+    title TEXT,  \
+    text TEXT,  \
+    tagName TEXT,  \
+    FOREIGN KEY (username) REFERENCES users(username),  \
+    FOREIGN KEY (tagName) REFERENCES tags(tagName))"
+)
+
+db.execute("CREATE TABLE IF NOT EXISTS tags (  \
+    tagName TEXT PRIMARY KEY,  \
+    username TEXT,  \
+    FOREIGN KEY (username) REFERENCES users(username))"
+)
 
 # an app route to allow user to register (from the register.html page)
 @app.route("/register", methods=["GET", "POST"])
@@ -162,52 +182,29 @@ def main():
             db.execute("INSERT INTO tags (tagName, username) VALUES (?,?)", [newTag, username])
             conn.commit()
 
-        if "nextMonth" or "prevMonth" in request.form:
+        #if "nextMonth" or "prevMonth" in request.form:
 
-            # TO SWITCH MONTH, when next or prev is clicked, this execut4es
-            # get the current values for next montha and prev month using if 
-            if "nextMonth" in request.form:
-                monthNow = request.form.get("nextMonth")
-                year = request.form.get("currentYear")
-
-                if monthNow == 1:
-                    yearNow = year + 1
-                else:
-                    yearNow = year
-
-                currentMonth = monthNow
-                currentYear = yearNow
+        # TO SWITCH MONTH, when next or prev is clicked, this execut4es
+        # get the current values for next montha and prev month using if 
+        if "nextMonth" in request.form:
+            currentMonth = request.form.get("nextMonth")
+            currentYear = request.form.get("nextYear")
 
 
-            if "prevMonth" in request.form:
-                monthNow = request.form.get("prevMonth")
-                year = request.form.get("currentYear")
+        if "prevMonth" in request.form:
+            currentMonth = request.form.get("prevMonth")
+            currentYear = request.form.get("prevYear")
 
-                if monthNow == 12:
-                    yearNow = year - 1
-                else:
-                    yearNow = year
-                
-                currentMonth = monthNow
-                currentYear = yearNow
 
         return redirect("/main")
     
     else:
-        # extracting current year and date
-        # now = datetime.now()
-        # month_name = now.strftime('%B')
-        # month = today.month
-        # year = now.year
-
-        if not session["user_id"]: 
-            return redirect("/login")
+        # extracting current year and date using the global variables that can be updated when user clicks next or prev month
 
         month = int(currentMonth)
         year = int(currentYear)
 
         username = session["user_id"]
-
         name = db.execute("SELECT name FROM users WHERE username = ?", [username]).fetchone()[0]
 
         if month == 12:
@@ -261,41 +258,10 @@ def main():
         tagLen = len(tagName)
 
 
-        return render_template('main.html', month_names=month_names, month_name=month_name, year=year, day_name=day_names, calendar=calendar_data, isEntry=isEntry, prevMonth=prevMonth, prevYear=prevYear, nextMonth=nextMonth, nextYear=nextYear, name=name, tagName=tagName, tagLen=tagLen)
+        return render_template('main.html', month_names=month_names, month_name=month_name, year=year, day_name=day_names, 
+                                calendar=calendar_data, isEntry=isEntry, prevMonth=prevMonth, prevYear=prevYear, 
+                                nextMonth=nextMonth, nextYear=nextYear, name=name, tagName=tagName, tagLen=tagLen)
 
-'''
-FIX PLS YOU CANT HAVE A CALENDAR WITH ONLY ONE MONTH STUPID
-@app.route("/switchMonth", methods=["POST"])
-def switch():
-
-    # get the current values for next montha and prev month using if 
-    if "nextMonth" in request.form:
-        monthNow = request.form.get("nextMonth")
-        year = request.form.get("currentYear")
-
-        if monthNow == 1:
-            yearNow = year + 1
-        else:
-            yearNow = year
-
-    if "prevMonth" in request.form:
-        monthNow = request.form.get("prevMonth")
-        year = request.form.get("currentYear")
-
-        if monthNow == 12:
-            yearNow = year - 1
-        else:
-            yearNow = year
-        
-
-    print("month NOW IS: ", monthNow)
-    print("year NOW IS : ", yearNow)
-
-    currentMonth = monthNow
-    currentYear = yearNow
-
-    return redirect("/main")
-'''
 
 #main route which shows the user the info for the date that they clicked
 @app.route("/event/<int:year>/<string:month>/<int:day>")
@@ -322,15 +288,12 @@ def event(year, month, day):
     conDate = str(year) + "-" + str(monthDay) + "-" + str(day)
 
     username = session["user_id"]
-    print(conDate)
     entries = db.execute("SELECT title, text, tagName FROM entry WHERE date = (?) AND username = (?)", [conDate, username]).fetchall()
 
-    print("the entries db is: ", entries)
     dateEntries = []
     for entry in entries:
         dateEntries.append({"title": entry[0], "text": entry[1], "tag": entry[2]})
 
-    print("dateEntries isss: ", dateEntries)
 
     return render_template("event.html", date=conDate, entries=dateEntries)
 
@@ -367,8 +330,6 @@ def isEntry(year, month_name, day):
     rows = db.execute("SELECT * FROM entry WHERE username = (?) AND date = (?)", [username, theDate])
     row = db.fetchone()
     
-    #print("rows: ", rows)
-    #print("row: ", row)
     
     if row is not None:
         return True 
@@ -418,14 +379,11 @@ def tag():
         username = session["user_id"]
         
         tagRows = db.execute("SELECT date, title, text FROM entry WHERE tagName = (?) AND username = (?)", [tagName, username]).fetchall()
-        #tagText = db.execute("SELECT text FROM entry WHERE tagName= (?) AND username = (?)", [tagName, username]).fetchall()
 
-        print("the TAGROWS IS: ", tagRows)
         tags = []
         for row in tagRows:
             data = {"date": row[0], "title": row[1], "text": row[2]}
             tags.append(data)
-        print("tags dict is: ", tags)
 
         return render_template("tags.html", tags=tags, tagName=tagName)
 
@@ -446,15 +404,28 @@ def view():
 #route to save changes that user made
 @app.route("/edit", methods=["POST"])
 def edit():
+
     username = session["user_id"]
     entryid = request.form.get("editId")
     title = request.form.get("editTitle")
     text = request.form.get("editText")
 
-    db.execute("UPDATE ENTRY SET title = (?), text = (?) WHERE entryId = (?)", [title, text, entryid])
-    conn.commit
+    if "editButton" in request.form:
+        db.execute("UPDATE ENTRY SET title = (?), text = (?) WHERE entryId = (?)", [title, text, entryid])
+        conn.commit
+
+    if "deleteButton" in request.form:
+        db.execute("DELETE FROM entry WHERE entryId = (?)", [entryid])
+        conn.commit
 
     return redirect("/main")
+    
+
+@app.route("/delete", methods=["POST"])
+def delete():
+    entryid = request.form.get("entryId")
+    db.execute("DELETE FROM entry WHERE entryId = (?)", [entryid])
+    conn.commit
 
 
 #main route which shows the calendar with the current dates
@@ -470,4 +441,4 @@ def logout():
     session.clear()
 
     # Redirect user to login form
-    return redirect("/")
+    return redirect("/login")

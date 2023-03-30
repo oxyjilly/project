@@ -14,13 +14,13 @@
             
             
             <form action="/main" method="post">
-                <input type="hidden" name="currentYear" value="{{ year }}"></input>
+                <input type="hidden" name="prevYear" value="{{ prevYear }}"></input>
+                <input type="hidden" name="nextYear" value="{{ nextYear }}"></input>
                 <button type="submit" name="prevMonth" value="{{ prevMonth }}" style="display: inline-block;"> &lt; </button>
                 <h1 class="centered" style="display: inline-block;">{{ month_name }} {{ year }}</h1>
                 <button type="submit" name="nextMonth" value="{{ nextMonth }}" style="display: inline-block;"> &gt; </button>
 
             </form> 
-
 
             <table id="calendar">
                 <thead>

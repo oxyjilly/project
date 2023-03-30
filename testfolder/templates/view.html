@@ -13,7 +13,10 @@
                 <input type="hidden" name="editId" value="{{ view["id"] }}"></input>
                 <textarea type="text" name="editTitle" class="subTitle">{{ view["title"] }}</textarea><br>
                 <textarea type="text" name="editText" class="subBox">{{ view["text"] }}</textarea><br>
-                <button type="submit">Save</button><br>
+                <button type="submit" name="editButton">Save</button><br><br>
+
+                <button type="submit" name="deleteButton">Delete entry</button>
+
             {% endfor %} 
         </form>
     </div>
