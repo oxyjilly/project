@@ -285,6 +285,11 @@ def event(year, month, day):
 
     monthDay = month_dict[month]
 
+    if day < 10:
+        day = "0" + str(day)
+    else:
+        day = day
+
     conDate = str(year) + "-" + str(monthDay) + "-" + str(day)
 
     username = session["user_id"]
